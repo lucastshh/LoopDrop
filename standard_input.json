@@ -1,0 +1,24 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "LoopDrop.sol": {
+      "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.20;\r\n\r\ninterface IERC20 {\r\n    function transferFrom(address from, address to, uint256 amount) external returns (bool);\r\n    function transfer(address to, uint256 amount) external returns (bool);\r\n}\r\n\r\n/**\r\n * @title LoopDrop\r\n * @notice Micro-marketplace for audio loops/samples on ARC testnet.\r\n *         Producer lists a loop with a USDC price, buyer pays and gets\r\n *         an NFT license minted to their wallet. Royalty agent can\r\n *         trigger accumulated payout to producer.\r\n */\r\ncontract LoopDrop {\r\n    // ── State ──────────────────────────────────────────────────────────\r\n    address public owner;\r\n    IERC20  public usdc;\r\n\r\n    uint256 public nextLoopId = 1;\r\n    uint256 public nextTokenId = 1;\r\n\r\n    struct Loop {\r\n        address producer;\r\n        string  title;\r\n        uint256 price;   // USDC (6 decimals)\r\n        bool    active;\r\n    }\r\n\r\n    mapping(uint256 => Loop)    public loops;\r\n    mapping(uint256 => address) public licenseOwner;   // tokenId => holder\r\n    mapping(uint256 => uint256) public licenseLoop;    // tokenId => loopId\r\n    mapping(address => uint256) public pendingRoyalty; // producer => owed\r\n\r\n    // ── Events ─────────────────────────────────────────────────────────\r\n    event LoopListed(uint256 indexed loopId, address producer, string title, uint256 price);\r\n    event LoopPurchased(uint256 indexed loopId, address buyer, uint256 tokenId, uint256 price);\r\n    event RoyaltyPaid(address indexed producer, uint256 amount);\r\n    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);\r\n\r\n    // ── Constructor ────────────────────────────────────────────────────\r\n    constructor(address _usdc) {\r\n        owner = msg.sender;\r\n        usdc  = IERC20(_usdc);\r\n    }\r\n\r\n    // ── Producer: list a loop ──────────────────────────────────────────\r\n    function listLoop(string calldata title, uint256 price) external returns (uint256 loopId) {\r\n        require(price >= 50000 && price <= 150000, \"price 0.05-0.15 USDC\");\r\n        loopId = nextLoopId++;\r\n        loops[loopId] = Loop(msg.sender, title, price, true);\r\n        emit LoopListed(loopId, msg.sender, title, price);\r\n    }\r\n\r\n    // ── Buyer: purchase loop, mint NFT license ─────────────────────────\r\n    function buyLoop(uint256 loopId) external returns (uint256 tokenId) {\r\n        Loop storage l = loops[loopId];\r\n        require(l.active, \"loop not active\");\r\n\r\n        // pull USDC from buyer\r\n        bool ok = usdc.transferFrom(msg.sender, address(this), l.price);\r\n        require(ok, \"USDC transfer failed\");\r\n\r\n        // accrue royalty for producer\r\n        pendingRoyalty[l.producer] += l.price;\r\n\r\n        // mint NFT license\r\n        tokenId = nextTokenId++;\r\n        licenseOwner[tokenId] = msg.sender;\r\n        licenseLoop[tokenId]  = loopId;\r\n\r\n        emit Transfer(address(0), msg.sender, tokenId);\r\n        emit LoopPurchased(loopId, msg.sender, tokenId, l.price);\r\n    }\r\n\r\n    // ── Royalty agent: pay out producer ───────────────────────────────\r\n    function payRoyalty(address producer) external {\r\n        uint256 amount = pendingRoyalty[producer];\r\n        require(amount > 0, \"nothing owed\");\r\n        pendingRoyalty[producer] = 0;\r\n        bool ok = usdc.transfer(producer, amount);\r\n        require(ok, \"USDC payout failed\");\r\n        emit RoyaltyPaid(producer, amount);\r\n    }\r\n\r\n    // ── Views ──────────────────────────────────────────────────────────\r\n    function getLoop(uint256 loopId) external view\r\n        returns (address producer, string memory title, uint256 price, bool active)\r\n    {\r\n        Loop storage l = loops[loopId];\r\n        return (l.producer, l.title, l.price, l.active);\r\n    }\r\n\r\n    function getLicense(uint256 tokenId) external view\r\n        returns (address holder, uint256 loopId)\r\n    {\r\n        return (licenseOwner[tokenId], licenseLoop[tokenId]);\r\n    }\r\n\r\n    // ── Admin ─────────────────────────────────────────────────────────\r\n    function delistLoop(uint256 loopId) external {\r\n        require(msg.sender == loops[loopId].producer || msg.sender == owner, \"unauthorized\");\r\n        loops[loopId].active = false;\r\n    }\r\n}\r\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "metadata"
+        ]
+      }
+    }
+  }
+}

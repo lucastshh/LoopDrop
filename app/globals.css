@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #ffffff;
+  --text: #000000;
+  --accent: #ff0000;
+  --link: #0000ee;
+  --link-visited: #551a8b;
+  --border: #000000;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: #ffff88;
+  color: var(--text);
+  font-family: "Times New Roman", Times, serif;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: var(--link);
+  text-decoration: underline;
+}
+
+a:visited {
+  color: var(--link-visited);
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+h1, h2, h3 {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+hr {
+  border: none;
+  border-top: 2px solid #000;
+  margin: 8px 0;
+}
+
+.blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  background: #ff0000;
+  color: #fff;
+  padding: 2px 0;
+}
+
+.counter-box {
+  display: inline-block;
+  background: #000;
+  color: #00ff00;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  padding: 2px 6px;
+  letter-spacing: 2px;
+  border: 1px solid #00ff00;
+}
+
+.under-construction {
+  background: repeating-linear-gradient(
+    45deg,
+    #000 0px, #000 10px,
+    #ffff00 10px, #ffff00 20px
+  );
+  color: #000;
+  font-weight: bold;
+  text-align: center;
+  padding: 4px;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+}
+
+table.layout {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.box {
+  border: 2px solid #000;
+  padding: 8px;
+}
+
+.box-red {
+  border: 2px solid #ff0000;
+  padding: 8px;
+}
+
+.box-dotted {
+  border: 2px dotted #000;
+  padding: 8px;
+}
+
+.tag {
+  display: inline-block;
+  background: #000;
+  color: #fff;
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  padding: 1px 4px;
+  margin: 1px;
+}
+
+.tag-red {
+  display: inline-block;
+  background: #ff0000;
+  color: #fff;
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  padding: 1px 4px;
+  margin: 1px;
+}
+
+.price-badge {
+  display: inline-block;
+  background: #ff0000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 2px 8px;
+  border: 2px solid #000;
+}
+
+.btn-old {
+  background: #c0c0c0;
+  color: #000;
+  border: 2px outset #fff;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.btn-old:active {
+  border-style: inset;
+}
+
+.btn-red {
+  background: #ff0000;
+  color: #fff;
+  border: 2px outset #ff8888;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.section-header {
+  background: #000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 3px 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.webring-bar {
+  background: #eeeeee;
+  border-top: 2px solid #000;
+  padding: 6px;
+  font-size: 12px;
+  text-align: center;
+}
+
+input[type="text"], input[type="number"], textarea, select {
+  border: 2px inset #888;
+  background: #fff;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  padding: 2px 4px;
+}
